@@ -29,7 +29,7 @@ rpm -Uvh http://spacewalk.redhat.com/yum/1.7/RHEL/$version/$machine/spacewalk-cl
 
 [ "$version" -eq "5" ] && rpm -Uvh http://dl.fedoraproject.org/pub/epel/$version/$machine/python-hashlib-20081119-4.el5.$machine.rpm
 
-echo yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-security.noarch python-hashlib
+yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-security.noarch python-hashlib
 
 rpm -Uvh http://$spacewalk/pub/rhn-org-trusted-ssl-cert-1.0-1.noarch.rpm --force
 
