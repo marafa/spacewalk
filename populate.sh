@@ -77,9 +77,9 @@ do
 done
 
 echo "`date` INFO: Populating Errata for CentOS 6"
-cd /root/bin
+cd /root/bin > /dev/null
 time /root/bin/centos-errata.py -l $user --password $password -f mail-archive.com --centos-version=6 -c /root/bin/centos6-errata.cfg
-cd -
+cd - /dev/null
 }
 
 repo(){
@@ -109,7 +109,6 @@ done
 #rhel5
 #centos5
 centos6
-
 repo
 
 echo ============================
