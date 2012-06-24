@@ -19,7 +19,7 @@ fi
 ###main
  
 yum clean all
-#yum -y erase rhn-org-trusted-ssl-cert-1.0-1.noarch
+yum -y erase rhn-org-trusted-ssl-cert-1.0-1.noarch
 
 grep $spacewalk /etc/hosts > /dev/null 2>&1
 [ $? -eq 0 ] || echo -e "$ip\tspacewalk $spacewalk" >> /etc/hosts
