@@ -3,4 +3,4 @@ These are scripts and configuration files used to configure a spacewalk server a
 - client.sh 		- used on the client box to register it to the spacewalk server
 - populate.sh 		- will populate your spacewalk server with everything you need from channel setup to packages and errata - will take hours the first time it runs
 - rhel_channels.ini 	- used by spacewalk-common-channels to create RHEL channels
-- spacewalk.answer 	- the answer used by me to install spacewalk, configured for postgresql
+- spacewalk.answer 	- my answer file to install spacewalk, configured for postgresql
