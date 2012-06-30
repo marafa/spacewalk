@@ -6,7 +6,7 @@
 machine=`uname -m`
 spacewalk=spacewalk.vm.desktop.us
 ip=192.168.1.11
-#version
+#os version
 if [ -s /etc/centos-release ] 
 then
 	os=centos
