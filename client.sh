@@ -4,7 +4,7 @@
 
 ###variables
 machine=`uname -m`
-spacewalk=spacewalk.vm.desktop.us
+spacewalk=spacewalk.marafa.vm
 ip=192.168.1.11
 #os version
 if [ -s /etc/centos-release ] 
@@ -23,7 +23,7 @@ yum clean all
 yum -y erase rhn-org-trusted-ssl-cert-1.0-1.noarch
 
 #assuming spacewalk fqdn is not in the dns
-grep $spacewalk /etc/hosts > /dev/null 2>&1
+host $spacewalk > /dev/null 2>&1
 [ $? -eq 0 ] || echo -e "$ip\tspacewalk $spacewalk" >> /etc/hosts
 
 rpm -Uvh http://spacewalk.redhat.com/yum/1.7/RHEL/$version/$machine/spacewalk-client-repo-1.7-5.el$version.noarch.rpm
