@@ -4,3 +4,4 @@ These are scripts and configuration files used to configure a spacewalk server a
 - populate.sh 		- will populate your spacewalk server with everything you need from channel setup to packages and errata - will take hours the first time it runs
 - rhel_channels.ini 	- used by spacewalk-common-channels to create RHEL channels
 - spacewalk.answer 	- my answer file to install spacewalk, configured for postgresql
+- centos-errata.py	- use this version: https://raw.github.com/unreality/Centos-Errata/a6a3ab101f07975f51c5b51b68ca4de789b98e15/centos-errata.py
