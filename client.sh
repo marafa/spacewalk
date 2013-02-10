@@ -51,4 +51,6 @@ then
 #clean up old and duplicate repos
 	rm -rf /etc/yum.repos.d/CentOS-*.repo
 	rm -rf /etc/yum.repos.d/spacewalk-client*repo
+	yum clean all
+	echo "INFO: `hostname` is successfully registered with $spacewalk"
 fi
