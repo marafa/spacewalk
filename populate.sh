@@ -76,8 +76,8 @@ cd -
 
 centos6(){
 echo "`date` INFO: Creating channels for CentOS 6"
-/usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos6*' spacewalk18-client-centos6 -k unlimited
-for id in centos6-x86_64 centos6-x86_64-addons centos6-x86_64-contrib centos6-x86_64-extras centos6-x86_64-fasttrack centos6-x86_64-centosplus centos6-x86_64-updates spacewalk18-client-centos6
+/usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos6*' spacewalk18-client-centos6-x86_64 -k unlimited
+for id in centos6-x86_64 centos6-x86_64-addons centos6-x86_64-contrib centos6-x86_64-extras centos6-x86_64-fasttrack centos6-x86_64-centosplus centos6-x86_64-updates spacewalk18-client-centos6-x86_64
 do
         echo "`date` INFO: Syncing Spacewalk repo to Spacewalk channel $id"
         time /usr/bin/spacewalk-repo-sync --channel=$id  #--type yum
@@ -87,6 +87,14 @@ echo "`date` INFO: Populating Errata for CentOS 6"
 cd /root/bin > /dev/null
 time /root/bin/centos-errata.py -l $user --password $password -f mail-archive.com --centos-version=6 -c /root/bin/centos6-errata.cfg
 cd - > /dev/null
+}
+
+spacewalk18-client-centos6-x86_64(){
+id=spacewalk18-client-centos6-x86_64
+echo "`date` INFO: Creating channel for $id"
+/usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 spacewalk18-client-centos6 -k unlimited
+echo "`date` INFO: Syncing Spacewalk repo to Spacewalk channel $id"
+time /usr/bin/spacewalk-repo-sync --channel=$id  #--type yum
 }
 
 links(){
@@ -137,6 +145,7 @@ preparation
 #rhel5
 #centos5
 centos6
+#spacewalk18-client-centos6-x86_64 #just this one channel
 links
 repo
 
