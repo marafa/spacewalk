@@ -1,13 +1,14 @@
 #!/bin/sh
+#license is GPL or BSD. up to you
 
 #this script will register this box (an already deployed server) with a spacewalk server
-
+version=0.6
 ###variables
 machine=`uname -m`
-spacewalk=spacewalk.marafa.vm
+spacewalk=spacewalk.vm.desktop.us
 ip=192.168.1.11
 #os version
-if [ -s /etc/centos-release ] 
+if [ -s /etc/centos-release ]
 then
 	os=centos
 	grep 6 /etc/centos-release > /dev/null && version=6 || version=5
@@ -23,12 +24,16 @@ yum clean all
 yum -y erase rhn-org-trusted-ssl-cert-1.0-1.noarch
 
 #assuming spacewalk fqdn is not in the dns
-host $spacewalk > /dev/null 2>&1
-[ $? -eq 0 ] || echo -e "$ip\tspacewalk $spacewalk" >> /etc/hosts
+grep spacewalk /etc/hosts > /dev/null 2>&1
+if ! [ $? -eq 0 ]
+then
+        echo -e "$ip\tspacewalk $spacewalk" >> /etc/hosts
+fi
 
-rpm -Uvh http://spacewalk.redhat.com/yum/1.7/RHEL/$version/$machine/spacewalk-client-repo-1.7-5.el$version.noarch.rpm
-
-[ "$version" -eq "5" ] && rpm -Uvh http://dl.fedoraproject.org/pub/epel/$version/$machine/python-hashlib-20081119-4.el5.$machine.rpm || rpm -Uvh http://ftp.osuosl.org/pub/fedora-epel/6/i386/epel-release-6-7.noarch.rpm
+#install spacewalk client repo
+rpm -Uvh http://$spacewalk/pub/spacewalk-client-repo-1.8-4.el6.noarch.rpm 
+                                                                                                                                                                        
+[ "$version" -eq "5" ] && rpm -Uvh http://dl.fedoraproject.org/pub/epel/$version/$machine/python-hashlib-20081119-4.el5.$machine.rpm || rpm -Uvh http://$spacewalk/pub/epel-release-6-8.noarch.rpm
 
 #install rhn tools
 yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-security.noarch python-hashlib
@@ -37,7 +42,7 @@ yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-security.noarch pyt
 rpm -Uvh http://$spacewalk/pub/rhn-org-trusted-ssl-cert-1.0-1.noarch.rpm --force
 
 #now that /etc/sysconfig/rhn/up2date exists, lets customise it
-sed -i 's|sslCACert=/usr/share/rhn/RHNS-CA-CERT|sslCACert=/usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT|g' /etc/sysconfig/rhn/up2date 
+sed -i 's|sslCACert=/usr/share/rhn/RHNS-CA-CERT|sslCACert=/usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT|g' /etc/sysconfig/rhn/up2date
 sed -i 's|serverURL=.*$|serverURL=https://$spacewalk/XMLRPC|g' /etc/sysconfig/rhn/up2date
 
 echo "`date` INFO: Registering with $spacewalk"
@@ -46,11 +51,11 @@ rhnreg_ks --activationkey=1-$os$version-$machine --serverUrl=https://$spacewalk/
 
 #we good?
 rhn-channel -l > /dev/null
-if [ $? -eq 0 ] 
+if [ $? -eq 0 ]
 then
-#clean up old and duplicate repos
-	rm -rf /etc/yum.repos.d/CentOS-*.repo
-	rm -rf /etc/yum.repos.d/spacewalk-client*repo
-	yum clean all
-	echo "INFO: `hostname` is successfully registered with $spacewalk"
+	echo " INFO: `hostname` is now registered with $spacewalk"
+	#clean up old and duplicate repos
+	sed -i 's/enabled=1/enabled=0/g' /etc/yum.repos.d/{spacewalk-client*,CentOS*}repo
+else
+	echo " ERROR: Registeration with $spacewalk failed. Pls. check logs"
 fi
