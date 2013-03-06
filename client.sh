@@ -55,7 +55,8 @@ if [ $? -eq 0 ]
 then
 	echo " INFO: `hostname` is now registered with $spacewalk"
 	#clean up old and duplicate repos
-	sed -i 's/enabled=1/enabled=0/g' /etc/yum.repos.d/{spacewalk-client*,CentOS*}repo
+	rm -rf /etc/yum.repos.d/CentOS-*.repo
+	yum -y erase spacewalk-client-repo
 else
 	echo " ERROR: Registeration with $spacewalk failed. Pls. check logs"
 fi
