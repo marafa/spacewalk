@@ -2,15 +2,13 @@
 # populate.sh
 #version 0.8
 ### script to update the local spacewalk server
-###if this is the first time, it will initialize the repo
+### if this is the first time, it will initialize the repo
 ### different strategies are used to populate each OS
 
 echo ============================
 echo `date` `hostname`
 echo ============================
 
-#list all kickstart distributions here
-ks_distro=CentOS-6.2-x86_64 
 dir=/local/rhn/
 file=/tmp/spacewalk.rpms.lst
 repo=/var/www/html/repo
@@ -18,9 +16,11 @@ repo=/var/www/html/repo
 user=admin
 password=password
 #spacewalk version
-spc_ver=18
+#spc_ver=19
+spc_ver=`rpm -qi spacewalk-client-repo|grep Version| awk '{print $3}'|sed 's/\.//g'`
 
-
+#get version
+machine=`uname -m`
 if [ -s /etc/centos-release ] 
 then
         os=centos
@@ -30,6 +30,9 @@ else
         grep 6 /etc/redhat-release > /dev/null && version=6 || version=5
 fi
 
+#list all kickstart distributions here
+#ks_distro=CentOS-6.2-x86_64 
+ks_distro="centos$version-$machine"
 
 preparation(){
 #SELinux is to be disabled so Monitoring can work
@@ -42,6 +45,19 @@ time /etc/init.d/rhn-search cleanindex
 echo `date` INFO: Clearing YUM cache
 yum clean all
 echo
+
+if ! [ -f /var/www/html/pub/spacewalk-client-repo-1.9-1.el6.noarch.rpm ]
+then
+	echo " INFO: Downloading Spacewalk Client Repo"
+	cd /var/www/html/pub
+	wget http://yum.spacewalkproject.org/1.9-client/RHEL/6/x86_64/spacewalk-client-repo-1.9-1.el6.noarch.rpm 
+	cd -
+fi
+}
+
+cobbler(){
+[ -d /var/satellite/rhn/kickstart ] || mkdir -p /var/satellite/rhn/kickstart
+chown apache.root /var/satellite/rhn/kickstart 
 }
 
 rhel5(){
@@ -79,7 +95,7 @@ cd -
 
 centos6(){
 echo "`date` INFO: Creating channels for CentOS 6"
-/usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos6*' spacewalk18-client-centos6-x86_64 -k unlimited
+/usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos6*' spacewalk$spc_ver-client-centos6-x86_64 -k unlimited
 for id in centos6-x86_64 centos6-x86_64-addons centos6-x86_64-contrib centos6-x86_64-extras centos6-x86_64-fasttrack centos6-x86_64-centosplus centos6-x86_64-updates spacewalk$spc_ver-client-centos6-x86_64
 do
         echo "`date` INFO: Syncing Spacewalk repo to Spacewalk channel $id"
@@ -103,17 +119,11 @@ time /usr/bin/spacewalk-repo-sync --channel=$id  #--type yum
 links(){
 #script that will create a directory of symlinks for kickstart server.
 echo
-echo "`date` INFO: Creating repository for kickstart"
-
-#[ -d $repo ] && rm -rf $repo/* || mkdir -p $repo
-
 for distro in $ks_distro
 do
-#	mkdir -p $repo/$distro/images/pxeboot/
+	echo "`date` INFO: Creating repository for kickstart ($distro)"
 	rm -rf $repo/$distro
 	mkdir -p $repo/$distro/Packages
-	#[ -d $repo/$distro ] && mkdir -p $repo/$distro/images/pxeboot/
-#	cp -r /root/bin/pxeboot/* $repo/$distro/images/pxeboot/.
 	cp -r /root/bin/{images,isolinux,EFI} $repo/$distro/.
 done
 
@@ -138,9 +148,11 @@ done
 repo(){
 for distro in $ks_distro
 do
+	[ -d /var/www/html/repoview ] || ln -s $repo/$distro/repoview /var/www/html/repoview #personal: since i only have 1 disto
 	echo "`date` INFO: Running createrepo on $repo/$distro"
-	createrepo -d -p --update $repo/$distro > /tmp/populate.createrepo.log 2>&1
-	repoview -t "YUM Repo: $distro" -u "http://`hostname`" -f $repo/$distro > /tmp/populate.repoview.log 2>&1
+	createrepo --database --pretty --update $repo/$distro > /tmp/populate.$distro.createrepo.log 2>&1
+	echo "`date` INFO: Running repoview on $repo/$distro"
+	repoview -t "YUM Repo: $distro" -u "http://`hostname`" -f $repo/$distro > /tmp/populate.$distro.repoview.log 2>&1
 done
 }
 
@@ -149,6 +161,7 @@ preparation
 #centos5
 centos6
 #spacewalk_client #in case we need to do this alone
+cobbler
 links
 repo
 
