@@ -1,6 +1,6 @@
 #!/bin/sh
 # populate.sh
-#version 0.8
+#version 0.9
 ### script to update the local spacewalk server
 ### if this is the first time, it will initialize the repo
 ### different strategies are used to populate each OS
@@ -16,7 +16,6 @@ repo=/var/www/html/repo
 user=admin
 password=password
 #spacewalk version
-#spc_ver=19
 spc_ver=`rpm -qi spacewalk-client-repo|grep Version| awk '{print $3}'|sed 's/\.//g'`
 
 #get version
@@ -31,7 +30,6 @@ else
 fi
 
 #list all kickstart distributions here
-#ks_distro=CentOS-6.2-x86_64 
 ks_distro="centos$version-$machine"
 
 preparation(){
