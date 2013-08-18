@@ -2,7 +2,7 @@
 #license is GPL or BSD. up to you
 
 #this script will register this box (an already deployed server) with a spacewalk server
-version=0.7
+version=0.8
 ###variables
 bits=`uname -m`
 spacewalk=spacewalk.marafa.vm
@@ -34,7 +34,10 @@ then
 fi
 
 #install spacewalk client repo
-rpm -Uvh http://$spacewalk/pub/spacewalk-client-repo-1.9-1.el6.noarch.rpm 
+wget http://$spacewalk/pub/client.txt
+rpm=`cat client.txt`
+rm -rf client.txt
+rpm -Uvh http://$spacewalk/pub/$rpm
                                                                                                                                                                         
 [ "$version" -eq "5" ] && rpm -Uvh http://dl.fedoraproject.org/pub/epel/$version/$bits/python-hashlib-20081119-4.el5.$bits.rpm || rpm -Uvh http://$spacewalk/pub/epel-release-6-8.noarch.rpm
 
