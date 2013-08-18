@@ -1,6 +1,6 @@
 #!/bin/sh
 # populate.sh
-#version 0.9
+#version 0.10
 ### script to update the local spacewalk server
 ### if this is the first time, it will initialize the repo
 ### different strategies are used to populate each OS
@@ -16,9 +16,11 @@ repo=/var/www/html/repo
 user=admin
 password=password
 #spacewalk version
-spc_ver=`rpm -qi spacewalk-client-repo|grep Version| awk '{print $3}'|sed 's/\.//g'`
+spc_ver=`rpm -qv spacewalk-setup| sed 's/spacewalk-setup-//' | cut -d. -f1,2`
+#client channel name
+spc_client=`/usr/bin/spacewalk-common-channels -l | sort  | grep -v nightly | grep client-centos6 | tail -1 | awk '{print $1}'| sed 's/://'`
 
-#get version
+#get OS version
 machine=`uname -m`
 if [ -s /etc/centos-release ] 
 then
@@ -53,7 +55,7 @@ then
 fi
 }
 
-cobbler(){
+cobbler(){ #experimenting
 [ -d /var/satellite/rhn/kickstart ] || mkdir -p /var/satellite/rhn/kickstart
 chown apache.root /var/satellite/rhn/kickstart 
 }
@@ -93,8 +95,8 @@ cd -
 
 centos6(){
 echo "`date` INFO: Creating channels for CentOS 6"
-/usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos6*' spacewalk$spc_ver-client-centos6-x86_64 -k unlimited
-for id in centos6-x86_64 centos6-x86_64-addons centos6-x86_64-contrib centos6-x86_64-extras centos6-x86_64-fasttrack centos6-x86_64-centosplus centos6-x86_64-updates spacewalk$spc_ver-client-centos6-x86_64
+/usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos6*' spacewalk$spc_client-client-centos6-x86_64 -k unlimited
+for id in centos6-x86_64 centos6-x86_64-addons centos6-x86_64-contrib centos6-x86_64-extras centos6-x86_64-fasttrack centos6-x86_64-centosplus centos6-x86_64-updates $spc_client-$machine
 do
         echo "`date` INFO: Syncing Spacewalk repo to Spacewalk channel $id"
         time /usr/bin/spacewalk-repo-sync --channel=$id  #--type yum
@@ -107,10 +109,15 @@ cd - > /dev/null
 }
 
 spacewalk_client(){
-id=spacewalk$spc_ver-client-centos6-x86_64
+id=$spc_client
+echo ver = $spc_client
+echo id = $id
+echo channel= spacewalk20-client-centos6
 echo "`date` INFO: Creating channel for $id"
+echo /usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 $id -k unlimited
 /usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 $id -k unlimited
 echo "`date` INFO: Syncing Spacewalk repo to Spacewalk channel $id"
+echo time /usr/bin/spacewalk-repo-sync --channel=$id  #--type yum
 time /usr/bin/spacewalk-repo-sync --channel=$id  #--type yum
 }
 
@@ -146,7 +153,7 @@ done
 repo(){
 for distro in $ks_distro
 do
-	[ -d /var/www/html/repoview ] || ln -s $repo/$distro/repoview /var/www/html/repoview #personal: since i only have 1 disto
+	! [ -d /var/www/html/repoview ] || ln -s $repo/$distro/repoview /var/www/html/repoview #personal: since i only have 1 disto
 	echo "`date` INFO: Running createrepo on $repo/$distro"
 	createrepo --database --pretty --update $repo/$distro > /tmp/populate.$distro.createrepo.log 2>&1
 	echo "`date` INFO: Running repoview on $repo/$distro"
@@ -154,14 +161,42 @@ do
 done
 }
 
-preparation
+pub_dir(){ #contents of public dir /var/www/html/pub
+if ! [ -f /var/www/html/pub/client.sh ]
+then
+	mv /root/bin/client.sh /var/www/html/pub/client.sh
+	ln -s /var/www/html/pub/client.sh /root/bin/client.sh
+fi
+
+rpm=`rpm -qv spacewalk-client-repo`
+rpm=$rpm.rpm
+
+if ! [ -f /var/www/html/pub/$rpm ]
+then
+        loc=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/$machine/
+	echo " INFO: Downloading $loc$rpm"
+        wget $loc$rpm --quiet > /dev/null 2>&1
+fi
+
+echo $rpm > /var/www/html/pub/client.txt
+}
+
+debug(){
+set -x
+trap read debug
+}
+
+#debug
+#!#preparation
 #rhel5
 #centos5
-centos6
-#spacewalk_client #in case we need to do this alone
-cobbler
-links
-repo
+#!#centos6
+spacewalk_client #in case we need to do this alone
+#cobbler
+#!#links
+#!#repo
+#!#pub_dir
 
+#end
 echo ============================
 echo `date` `hostname`
