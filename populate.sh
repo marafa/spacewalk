@@ -187,15 +187,15 @@ trap read debug
 }
 
 #debug
-#!#preparation
+preparation
 #rhel5
 #centos5
-#!#centos6
+centos6
 spacewalk_client #in case we need to do this alone
 #cobbler
-#!#links
-#!#repo
-#!#pub_dir
+links
+repo
+pub_dir
 
 #end
 echo ============================
