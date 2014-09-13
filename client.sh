@@ -6,7 +6,7 @@ version=0.8
 ###variables
 bits=`uname -m`
 spacewalk=spacewalk.marafa.vm
-ip=192.168.1.11
+ip=192.168.0.104
 #os version
 if [ -s /etc/centos-release ]
 then

@@ -12,13 +12,25 @@ echo ============================
 dir=/local/rhn/
 file=/tmp/spacewalk.rpms.lst
 repo=/var/www/html/repo
+client_repo_URL=http://yum.spacewalkproject.org/2.2-client/RHEL/6/x86_64/spacewalk-client-repo-2.2-1.el6.noarch.rpm
+lockfile=/var/tmp/populate.lck
+
+#create lock file
+if [ -e $lockfile ]
+then
+	echo " WARN: Lock file $lockfile exists. Is `basename $0` running?"
+	exit 1
+else
+	touch $lockfile
+fi
+
 #spacewalk admin credentials
 user=admin
 password=password
 #spacewalk version
 spc_ver=`rpm -qv spacewalk-setup| sed 's/spacewalk-setup-//' | cut -d. -f1,2`
 #client channel name
-spc_client=`/usr/bin/spacewalk-common-channels -l | sort  | grep -v nightly | grep client-centos6 | tail -1 | awk '{print $1}'| sed 's/://'`
+spc_client=`[ -f /usr/bin/spacewalk-common-channels ] && /usr/bin/spacewalk-common-channels -l | sort  | grep -v nightly | grep client-centos6 | tail -1 | awk '{print $1}'| sed 's/://'`
 
 #get OS version
 machine=`uname -m`
@@ -46,13 +58,15 @@ echo `date` INFO: Clearing YUM cache
 yum clean all
 echo
 
-if ! [ -f /var/www/html/pub/spacewalk-client-repo-1.9-1.el6.noarch.rpm ]
+if ! [ -f /var/www/html/pub/spacewalk-client-repo*.el6.noarch.rpm ]
 then
 	echo " INFO: Downloading Spacewalk Client Repo"
 	cd /var/www/html/pub
-	wget http://yum.spacewalkproject.org/1.9-client/RHEL/6/x86_64/spacewalk-client-repo-1.9-1.el6.noarch.rpm 
+	wget $client_repo_URL
 	cd -
 fi
+
+[ -f /usr/bin/spacewalk-common-channels ] || yum -y install spacewalk-utils
 }
 
 cobbler(){ #experimenting
@@ -129,7 +143,12 @@ do
 	echo "`date` INFO: Creating repository for kickstart ($distro)"
 	rm -rf $repo/$distro
 	mkdir -p $repo/$distro/Packages
-	cp -r /root/bin/{images,isolinux,EFI} $repo/$distro/.
+	if [ -d /root/bin/images ]
+	then 
+		cp -r /root/bin/{images,isolinux,EFI} $repo/$distro/.
+	else
+		echo "`date` WARN: /root/bin/images missing. Skipping"
+	fi
 done
 
 for pkg in `ls /var/satellite/redhat/1/*/*/*/*/*`
@@ -151,6 +170,12 @@ done
 }
 
 repo(){
+prefix=/usr/bin
+if ! [ -e "$prefix/repoview" ] || ! [ -e "$prefix/createrepo" ]
+#if ! [ -e /usr/bin/{repoview,createrepo} ] 
+then
+	echo " WARN: Either repoview or createrepo is not installed. Skipping"
+else
 for distro in $ks_distro
 do
 	! [ -d /var/www/html/repoview ] || ln -s $repo/$distro/repoview /var/www/html/repoview #personal: since i only have 1 disto
@@ -159,6 +184,7 @@ do
 	echo "`date` INFO: Running repoview on $repo/$distro"
 	repoview -t "YUM Repo: $distro" -u "http://`hostname`" -f $repo/$distro > /tmp/populate.$distro.repoview.log 2>&1
 done
+fi
 }
 
 pub_dir(){ #contents of public dir /var/www/html/pub
@@ -191,7 +217,7 @@ preparation
 #rhel5
 #centos5
 centos6
-#spacewalk_client #in case we need to do this alone
+spacewalk_client #in case we need to do this alone
 #cobbler
 links
 repo
@@ -200,3 +226,4 @@ pub_dir
 #end
 echo ============================
 echo `date` `hostname`
+m -rf $lockfile #cleanup
