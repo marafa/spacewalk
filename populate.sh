@@ -58,15 +58,35 @@ echo `date` INFO: Clearing YUM cache
 yum clean all
 echo
 
-if ! [ -f /var/www/html/pub/spacewalk-client-repo*.el6.noarch.rpm ]
+if ! [ -f /etc/yum.repos.d/spacewalk-client.repo ] 
 then
-	echo " INFO: Downloading Spacewalk Client Repo"
-	cd /var/www/html/pub
-	wget $client_repo_URL
-	cd -
+	yum -y install $client_repo_URL
+	yum -y update spacewalk-client-repo
 fi
 
+#if ! [ -f /var/www/html/pub/spacewalk-client-repo*.el6.noarch.rpm ]
+#then
+#	echo " INFO: Downloading Spacewalk Client Repo"
+#	cd /var/www/html/pub
+#	wget $client_repo_URL
+#	cd -
+#fi
+
+rpm=`rpm -qv spacewalk-client-repo`
+rpm=$rpm.rpm
+
+if ! [ -f /var/www/html/pub/$rpm ]
+then
+        loc=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/$machine/
+	echo " INFO: Downloading $loc$rpm"
+        wget $loc$rpm --quiet > /dev/null 2>&1
+fi
+
+echo $rpm > /var/www/html/pub/client.txt
+
 [ -f /usr/bin/spacewalk-common-channels ] || yum -y install spacewalk-utils
+rpm -q --whatprovides python-lxml || yum -y install python-lxm
+
 }
 
 cobbler(){ #experimenting
@@ -194,17 +214,6 @@ then
 	ln -s /var/www/html/pub/client.sh /root/bin/client.sh
 fi
 
-rpm=`rpm -qv spacewalk-client-repo`
-rpm=$rpm.rpm
-
-if ! [ -f /var/www/html/pub/$rpm ]
-then
-        loc=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/$machine/
-	echo " INFO: Downloading $loc$rpm"
-        wget $loc$rpm --quiet > /dev/null 2>&1
-fi
-
-echo $rpm > /var/www/html/pub/client.txt
 }
 
 debug(){
@@ -212,12 +221,12 @@ set -x
 trap read debug
 }
 
-#debug
+#debug #do not use if batch mode
 preparation
 #rhel5
 #centos5
 centos6
-spacewalk_client #in case we need to do this alone
+#spacewalk_client #in case we need to do this alone
 #cobbler
 links
 repo
@@ -226,4 +235,4 @@ pub_dir
 #end
 echo ============================
 echo `date` `hostname`
-m -rf $lockfile #cleanup
+rm -rf $lockfile #cleanup
