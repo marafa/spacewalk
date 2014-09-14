@@ -79,7 +79,7 @@ if ! [ -f /var/www/html/pub/$rpm ]
 then
         loc=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/$machine/
 	echo " INFO: Downloading $loc$rpm"
-        wget $loc$rpm --quiet > /dev/null 2>&1
+        wget $loc$rpm --quiet -O /var/www/html/pub/$rpm > /dev/null 2>&1
 fi
 
 echo $rpm > /var/www/html/pub/client.txt
@@ -221,16 +221,16 @@ set -x
 trap read debug
 }
 
-#debug #do not use if batch mode
+debug #do not use if batch mode
 preparation
 #rhel5
 #centos5
-centos6
+#centos6
 #spacewalk_client #in case we need to do this alone
 #cobbler
-links
-repo
-pub_dir
+#links
+#repo
+#pub_dir
 
 #end
 echo ============================
