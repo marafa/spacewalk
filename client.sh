@@ -56,7 +56,7 @@ then
 	sed -i 's|serverURL=.*$|serverURL=https://$fqdn/XMLRPC|g' /etc/sysconfig/rhn/up2date
 else
 	echo " ERROR! /etc/sysconfig/rhn/up2date not found. Unable to continue!"
-	exit
+	exit 1
 fi
 
 echo "`date` INFO: Registering with $fqdn"
