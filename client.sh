@@ -71,6 +71,7 @@ then
 	#clean up old and duplicate repos
 	echo " INFO: Cleaning up old and/or duplicate repos"
 	rm -rf /etc/yum.repos.d/CentOS*repo #no enable= line in these repos. deleting instead
+	#the following are no longer required and therefore erased
 	yum -y erase spacewalk-client-repo $epel
 else
 	echo " ERROR: Registration with $fqdn failed. Pls. check logs"
