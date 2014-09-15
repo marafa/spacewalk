@@ -9,20 +9,14 @@ echo ============================
 echo `date` `hostname`
 echo ============================
 
+############################################
+#begin variables section
+
 dir=/local/rhn/
 file=/tmp/spacewalk.rpms.lst
-repo=/var/www/html/repo
+repo=/var/www/html/pub/repo
 client_repo_URL=http://yum.spacewalkproject.org/2.2-client/RHEL/6/x86_64/spacewalk-client-repo-2.2-1.el6.noarch.rpm
 lockfile=/var/tmp/populate.lck
-
-#create lock file
-if [ -e $lockfile ]
-then
-	echo " WARN: Lock file $lockfile exists. Is `basename $0` running?"
-	exit 1
-else
-	touch $lockfile
-fi
 
 #spacewalk admin credentials
 user=admin
@@ -46,6 +40,19 @@ fi
 #list all kickstart distributions here
 ks_distro="centos$version-$machine"
 
+
+#end variables section
+####################################################
+
+#create lock file
+if [ -e $lockfile ]
+then
+	echo " WARN: Lock file $lockfile exists. Is `basename $0` running?"
+	exit 1
+else
+	touch $lockfile
+fi
+
 preparation(){
 #SELinux is to be disabled so Monitoring can work
 /usr/sbin/setenforce 0
@@ -64,14 +71,6 @@ then
 	yum -y update spacewalk-client-repo
 fi
 
-#if ! [ -f /var/www/html/pub/spacewalk-client-repo*.el6.noarch.rpm ]
-#then
-#	echo " INFO: Downloading Spacewalk Client Repo"
-#	cd /var/www/html/pub
-#	wget $client_repo_URL
-#	cd -
-#fi
-
 rpm=`rpm -qv spacewalk-client-repo`
 rpm=$rpm.rpm
 
@@ -87,6 +86,11 @@ echo $rpm > /var/www/html/pub/client.txt
 [ -f /usr/bin/spacewalk-common-channels ] || yum -y install spacewalk-utils
 rpm -q --whatprovides python-lxml || yum -y install python-lxm
 
+if ! [ -f /root/bin/rhn-clone-errata.py ] 
+then
+	echo " WARN: /root/bin/rhn-clone-errata.py. "
+	echo " INFO: Download from https://raw.github.com/unreality/Centos-Errata/a6a3ab101f07975f51c5b51b68ca4de789b98e15/centos-errata.py. Continuing"
+fi
 }
 
 cobbler(){ #experimenting
@@ -160,7 +164,7 @@ links(){
 echo
 for distro in $ks_distro
 do
-	echo "`date` INFO: Creating repository for kickstart ($distro)"
+	echo "`date` INFO: Creating repository for kickstart ($distro) at $repo/$distro/"
 	rm -rf $repo/$distro
 	mkdir -p $repo/$distro/Packages
 	if [ -d /root/bin/images ]
@@ -198,7 +202,7 @@ then
 else
 for distro in $ks_distro
 do
-	! [ -d /var/www/html/repoview ] || ln -s $repo/$distro/repoview /var/www/html/repoview #personal: since i only have 1 disto
+	! [ -d /var/www/html/pub/repoview ] || ln -s $repo/$distro/repoview /var/www/html/pub/repoview #personal: since i only have 1 disto
 	echo "`date` INFO: Running createrepo on $repo/$distro"
 	createrepo --database --pretty --update $repo/$distro > /tmp/populate.$distro.createrepo.log 2>&1
 	echo "`date` INFO: Running repoview on $repo/$distro"
@@ -210,10 +214,10 @@ fi
 pub_dir(){ #contents of public dir /var/www/html/pub
 if ! [ -f /var/www/html/pub/client.sh ]
 then
+	echo " INFO: Populating client.sh"
 	mv /root/bin/client.sh /var/www/html/pub/client.sh
 	ln -s /var/www/html/pub/client.sh /root/bin/client.sh
 fi
-
 }
 
 debug(){
@@ -221,7 +225,7 @@ set -x
 trap read debug
 }
 
-#debug #do not use if batch mode
+#debug #do not use in batch mode
 preparation
 #rhel5
 #centos5
