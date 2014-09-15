@@ -2,7 +2,6 @@
 #license is GPL or BSD. up to you
 #this script will register this box (an already deployed server) with a spacewalk server
 
-version=0.8
 ###variables
 bits=`uname -m`
 fqdn=spacewalk.marafa.vm
