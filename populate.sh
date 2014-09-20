@@ -65,12 +65,7 @@ echo `date` INFO: Clearing YUM cache
 yum clean all
 echo
 
-if ! [ -f /etc/yum.repos.d/spacewalk-client.repo ] 
-then
-	yum -y install $client_repo_URL
-	yum -y update spacewalk-client-repo
-fi
-
+##### spacewalk client repo needed for rhn client packages
 rpm=`rpm -qv spacewalk-client-repo`
 rpm=$rpm.rpm
 
@@ -83,14 +78,30 @@ fi
 
 echo $rpm > /var/www/html/pub/client.txt
 
-[ -f /usr/bin/spacewalk-common-channels ] || yum -y install spacewalk-utils
+####################################################
+# script dependencies
+### program 1
 rpm -q --whatprovides python-lxml || yum -y install python-lxm
 
+###program 2
+if ! [ -f /etc/yum.repos.d/spacewalk-client.repo ] 
+then
+	yum -y install $client_repo_URL
+	yum -y update spacewalk-client-repo
+fi
+
+###program 3
+[ -f /usr/bin/spacewalk-common-channels ] || yum -y install spacewalk-utils
+
+
+###program 4
 if ! [ -f /root/bin/rhn-clone-errata.py ] 
 then
 	echo " WARN: /root/bin/rhn-clone-errata.py. "
 	echo " INFO: Download from https://raw.github.com/unreality/Centos-Errata/a6a3ab101f07975f51c5b51b68ca4de789b98e15/centos-errata.py. Continuing"
 fi
+# end script dependencies
+###################################################
 }
 
 cobbler(){ #experimenting
