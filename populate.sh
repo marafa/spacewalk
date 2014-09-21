@@ -37,10 +37,6 @@ else
         grep 6 /etc/redhat-release > /dev/null && version=6 || version=5
 fi
 
-#list all kickstart distributions here
-ks_distro="centos$version-$machine"
-
-
 #end variables section
 ####################################################
 
@@ -128,6 +124,11 @@ done
 }
 
 centos5(){
+
+#list all kickstart distributions here
+#ks_distro="$ks_distro centos$version-$machine"
+ks_distro="$ks_distro centos5-x86_64"
+
 echo "`date` INFO: Creating channels for CentOS 5"
 /usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos5*' -k unlimited
 for id in centos5-x86_64 centos5-x86_64-addons centos5-x86_64-contrib centos5-x86_64-extras centos5-x86_64-fasttrack centos5-x86_64-centosplus centos5-x86_64-updates
@@ -143,6 +144,9 @@ cd -
 }
 
 centos6(){
+#list all kickstart distributions here
+ks_distro="$ks_distro centos6-x86_64"
+
 echo "`date` INFO: Creating channels for CentOS 6"
 /usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos6*' spacewalk$spc_client-client-centos6-x86_64 -k unlimited
 for id in centos6-x86_64 centos6-x86_64-addons centos6-x86_64-contrib centos6-x86_64-extras centos6-x86_64-fasttrack centos6-x86_64-centosplus centos6-x86_64-updates $spc_client-$machine
@@ -186,7 +190,7 @@ do
 	fi
 done
 
-for pkg in `ls /var/satellite/redhat/1/*/*/*/*/*`
+for pkg in `ls /var/satellite/redhat/1/*/*/*/*/*/*`
 do 
         echo $pkg
 done > $file
@@ -237,10 +241,10 @@ trap read debug
 }
 
 #debug #do not use in batch mode
-preparation
+#preparation
 #rhel5
 #centos5
-centos6
+#centos6
 #spacewalk_client #in case we need to do this alone
 #cobbler
 links
