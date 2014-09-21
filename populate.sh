@@ -9,6 +9,16 @@ echo ============================
 echo `date` `hostname`
 echo ============================
 
+lockfile=/var/tmp/populate.lck
+#create lock file
+if [ -e $lockfile ]
+then
+	echo " WARN: Lock file $lockfile exists. Is `basename $0` running?"
+	exit 1
+else
+	touch $lockfile
+fi
+
 ############################################
 #begin variables section
 
@@ -16,7 +26,6 @@ dir=/local/rhn/
 file=/tmp/spacewalk.rpms.lst
 repo=/var/www/html/pub/repo
 client_repo_URL=http://yum.spacewalkproject.org/2.2-client/RHEL/6/x86_64/spacewalk-client-repo-2.2-1.el6.noarch.rpm
-lockfile=/var/tmp/populate.lck
 
 #spacewalk admin credentials
 user=admin
@@ -40,14 +49,9 @@ fi
 #end variables section
 ####################################################
 
-#create lock file
-if [ -e $lockfile ]
-then
-	echo " WARN: Lock file $lockfile exists. Is `basename $0` running?"
-	exit 1
-else
-	touch $lockfile
-fi
+debug_msg(){
+echo Debug $*
+}
 
 preparation(){
 #SELinux is to be disabled so Monitoring can work
@@ -182,6 +186,7 @@ do
 	echo "`date` INFO: Creating repository for kickstart ($distro) at $repo/$distro/"
 	rm -rf $repo/$distro
 	mkdir -p $repo/$distro/Packages
+	#centos 6 only !!!
 	if [ -d /root/bin/images ]
 	then 
 		cp -r /root/bin/{images,isolinux,EFI} $repo/$distro/.
@@ -201,10 +206,14 @@ do
         if [ $? -eq 0 ] 
         then
                 trg=$LINE
+		link=`basename $LINE`
+		debug_msg $LINE is a target link is $link 
         else
                 link=$LINE
-                ln -s $trg $repo/$distro/Packages/$link
+		debug_msg $LINE is a link
         fi
+        ln -s $trg $repo/$distro/Packages/$link
+	debug_msg ln -s $trg $repo/$distro/Packages/$link
 done
 }
 
@@ -241,12 +250,14 @@ trap read debug
 }
 
 #debug #do not use in batch mode
-#preparation
+#debug=TRUE
+preparation
 #rhel5
 #centos5
-#centos6
+centos6
 #spacewalk_client #in case we need to do this alone
 #cobbler
+#ks_distro="$ks_distro centos$version-$machine" #needed for links is run by itself
 links
 repo
 pub_dir
