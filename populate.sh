@@ -50,7 +50,7 @@ fi
 ####################################################
 
 debug_msg(){
-echo Debug $*
+[ debug=TRUE ] && echo Debug $*
 }
 
 preparation(){
@@ -102,6 +102,13 @@ then
 fi
 # end script dependencies
 ###################################################
+
+### backup
+if [ -e /etc/yum.repos.d/CentOS-Base.repo ] 
+then
+	mkdir /root/backups
+	cp /etc/yum.repos.d/CentOS* /root/backups/
+fi
 }
 
 cobbler(){ #experimenting
@@ -231,6 +238,8 @@ do
 	createrepo --database --pretty --update $repo/$distro > /tmp/populate.$distro.createrepo.log 2>&1
 	echo "`date` INFO: Running repoview on $repo/$distro"
 	repoview -t "YUM Repo: $distro" -u "http://`hostname`" -f $repo/$distro > /tmp/populate.$distro.repoview.log 2>&1
+	echo "`date` INFO: Generating comps.xml in $repo/$distro"
+	createrepo -g comps.xml $repo/$distro
 done
 fi
 }
@@ -247,6 +256,7 @@ fi
 debug(){
 set -x
 trap read debug
+debug=TRUE
 }
 
 #debug #do not use in batch mode
@@ -257,7 +267,7 @@ preparation
 centos6
 #spacewalk_client #in case we need to do this alone
 #cobbler
-#ks_distro="$ks_distro centos$version-$machine" #needed for links is run by itself
+#ks_distro="$ks_distro centos$version-$machine" #needed for procedure links or repo is run by itself
 links
 repo
 pub_dir
