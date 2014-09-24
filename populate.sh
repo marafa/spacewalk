@@ -1,39 +1,26 @@
 #!/bin/sh
-# populate.sh
-#version 0.10
 ### script to update the local spacewalk server
 ### if this is the first time, it will initialize the repo
 ### different strategies are used to populate each OS
 
-echo ============================
-echo `date` `hostname`
-echo ============================
-
-lockfile=/var/tmp/populate.lck
-#create lock file
-if [ -e $lockfile ]
-then
-	echo " WARN: Lock file $lockfile exists. Is `basename $0` running?"
-	exit 1
-else
-	touch $lockfile
-fi
-
+variables(){
 ############################################
 #begin variables section
 
 dir=/local/rhn/
 file=/tmp/spacewalk.rpms.lst
 repo=/var/www/html/pub/repo
-client_repo_URL=http://yum.spacewalkproject.org/2.2-client/RHEL/6/x86_64/spacewalk-client-repo-2.2-1.el6.noarch.rpm
 
 #spacewalk admin credentials
 user=admin
 password=password
 #spacewalk version
 spc_ver=`rpm -qv spacewalk-setup| sed 's/spacewalk-setup-//' | cut -d. -f1,2`
+debug_msg spc_ver is $spc_ver
 #client channel name
 spc_client=`[ -f /usr/bin/spacewalk-common-channels ] && /usr/bin/spacewalk-common-channels -l | sort  | grep -v nightly | grep client-centos6 | tail -1 | awk '{print $1}'| sed 's/://'`
+debug_msg spc_client is $spc_client
+client_repo_URL=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/6/x86_64/spacewalk-client-repo-2.2-1.el6.noarch.rpm
 
 #get OS version
 machine=`uname -m`
@@ -48,9 +35,6 @@ fi
 
 #end variables section
 ####################################################
-
-debug_msg(){
-[ debug=TRUE ] && echo Debug $*
 }
 
 preparation(){
@@ -259,8 +243,31 @@ trap read debug
 debug=TRUE
 }
 
+#########################################
+# MAIN
+#########################################
+
+echo ============================
+echo `date` `hostname`
+echo ============================
+
+lockfile=/var/tmp/populate.lck
+#create lock file
+if [ -e $lockfile ]
+then
+	echo " WARN: Lock file $lockfile exists. Is `basename $0` running?"
+	exit 1
+else
+	touch $lockfile
+fi
+
+debug_msg(){
+[ debug=TRUE ] && echo Debug $*
+}
+
 #debug #do not use in batch mode
-#debug=TRUE
+variables
+#debug=TRUE #enable this if u only want specific debug messages
 preparation
 #rhel5
 #centos5
