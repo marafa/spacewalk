@@ -7,6 +7,7 @@ variables(){
 ############################################
 #begin variables section
 
+debug=FALSE
 dir=/local/rhn/
 file=/tmp/spacewalk.rpms.lst
 repo=/var/www/html/pub/repo
@@ -33,6 +34,10 @@ else
         grep 6 /etc/redhat-release > /dev/null && version=6 || version=5
 fi
 
+##### spacewalk client repo needed for rhn client packages
+rpm=`rpm -qv spacewalk-client-repo`
+rpm=$rpm.rpm
+
 #end variables section
 ####################################################
 }
@@ -48,10 +53,6 @@ time /etc/init.d/rhn-search cleanindex
 echo `date` INFO: Clearing YUM cache
 yum clean all
 echo
-
-##### spacewalk client repo needed for rhn client packages
-rpm=`rpm -qv spacewalk-client-repo`
-rpm=$rpm.rpm
 
 if ! [ -f /var/www/html/pub/$rpm ]
 then
@@ -79,9 +80,9 @@ fi
 
 
 ###program 4
-if ! [ -f /root/bin/rhn-clone-errata.py ] 
+if ! [ -f /root/bin/centos-errata.py ]
 then
-	echo " WARN: /root/bin/rhn-clone-errata.py. "
+	echo " WARN: /root/bin/rhn-clone-errata.py not found! "
 	echo " INFO: Download from https://raw.github.com/unreality/Centos-Errata/a6a3ab101f07975f51c5b51b68ca4de789b98e15/centos-errata.py. Continuing"
 fi
 # end script dependencies
@@ -262,11 +263,14 @@ else
 fi
 
 debug_msg(){
-[ debug=TRUE ] && echo Debug $*
+if [ debug == "TRUE" ] 
+then
+	echo Debug $*
+fi
 }
 
-#debug #do not use in batch mode
 variables
+#debug #do not use in batch mode
 #debug=TRUE #enable this if u only want specific debug messages
 preparation
 #rhel5
@@ -274,7 +278,7 @@ preparation
 centos6
 #spacewalk_client #in case we need to do this alone
 #cobbler
-#ks_distro="$ks_distro centos$version-$machine" #needed for procedure links or repo is run by itself
+#ks_distro="$ks_distro centos$version-$machine" #needed for procedure links or repo if run by itself
 links
 repo
 pub_dir
