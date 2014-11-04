@@ -157,6 +157,24 @@ time /root/bin/centos-errata.py -l $user --password $password -f mail-archive.co
 cd - > /dev/null
 }
 
+centos7(){
+#list all kickstart distributions here
+ks_distro="$ks_distro centos7-x86_64"
+
+echo "`date` INFO: Creating channels for CentOS 7"
+/usr/bin/spacewalk-common-channels -u $user -p $password -a x86_64 'centos7*' spacewalk$spc_client-client-centos7-x86_64 -k unlimited
+for id in centos7-x86_64 centos7-x86_64-addons centos7-x86_64-contrib centos7-x86_64-extras centos7-x86_64-fasttrack centos7-x86_64-centosplus centos7-x86_64-updates $spc_client-$machine
+do
+        echo "`date` INFO: Syncing Spacewalk repo to Spacewalk channel $id"
+        time /usr/bin/spacewalk-repo-sync --channel=$id  #--type yum
+done
+
+echo "`date` INFO: Populating Errata for CentOS 7"
+cd /root/bin > /dev/null
+time /root/bin/centos-errata.py -l $user --password $password -f mail-archive.com --centos-version=7 -c /root/bin/centos7-errata.cfg
+cd - > /dev/null
+}
+
 spacewalk_client(){
 id=$spc_client
 echo ver = $spc_client
@@ -276,6 +294,7 @@ preparation
 #rhel5
 #centos5
 centos6
+centos7
 #spacewalk_client #in case we need to do this alone
 #cobbler
 #ks_distro="$ks_distro centos$version-$machine" #needed for procedure links or repo if run by itself
