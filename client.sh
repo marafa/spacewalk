@@ -73,6 +73,7 @@ then
 	rm -rf /etc/yum.repos.d/CentOS*repo #no enable= line in these repos. deleting instead
 	#the following are no longer required and therefore erased
 	yum -y erase spacewalk-client-repo $epel
+	yum clean all
 else
 	echo " ERROR: Registration with $fqdn failed. Pls. check logs"
 fi
