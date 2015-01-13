@@ -1,4 +1,5 @@
 [jpackage-generic]
+#from https://fedorahosted.org/spacewalk/wiki/HowToInstall#Jpackagerepository
 name=JPackage generic
 #baseurl=http://mirrors.dotsrc.org/pub/jpackage/5.0/generic/free/
 mirrorlist=http://www.jpackage.org/mirrorlist.php?dist=generic&type=free&release=5.0

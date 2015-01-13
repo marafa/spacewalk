@@ -6,11 +6,30 @@ yum -y install http://yum.spacewalkproject.org/2.2/RHEL/6/x86_64/spacewalk-repo-
 yum -y update
 
 cd
-git https://github.com/marafa/spacewalk.git
+if [ -d /root/bin ]
+then
+	git update https://github.com/marafa/spacewalk.git
+else
+	git clone https://github.com/marafa/spacewalk.git
+fi
 mv /root/spacewalk /root/bin
 cp /root/bin/jpackage*repo /etc/yum.repos.d/jpackage-generic.repo
+
+##from https://fedorahosted.org/spacewalk/wiki/PostgreSQLServerSetup
+
+yum install -y 'postgresql-server > 8.4'
+yum install -y postgresql-pltcl
+
+chkconfig postgresql on
+service postgresql initdb
+service postgresql start
+
+su - postgres -c 'PGPASSWORD=spacepw; createdb -E UTF8 spaceschema ; createlang plpgsql spaceschema ; createlang pltclu spaceschema ; yes $PGPASSWORD | createuser -P -sDR spaceuser'
+
 yum -y install spacewalk-setup-postgresql
 yum -y install spacewalk-postgresql
+
 cd /root/bin
+export LANG=en_US.UTF-8
 spacewalk-setup --disconnected --answer-file=spacewalk.answer
 
