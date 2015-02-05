@@ -13,7 +13,7 @@ cd
 if [ -d /root/bin ]
 then
 	cd /root/bin
-	git update https://github.com/marafa/spacewalk.git
+	git pull https://github.com/marafa/spacewalk.git
 else
 	git clone https://github.com/marafa/spacewalk.git bin
 fi
