@@ -53,5 +53,6 @@ firewall
 postgresql
 
 cd /root/bin
+localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 export LANG=en_US.UTF-8
 spacewalk-setup --disconnected --answer-file=spacewalk.answer
