@@ -26,8 +26,8 @@ then
 fi
 cp /root/bin/jpackage*repo /etc/yum.repos.d/jpackage-generic.repo
 
+hmm(){
 ##from https://fedorahosted.org/spacewalk/wiki/PostgreSQLServerSetup
-
 yum install -y 'postgresql-server > 8.4'
 yum install -y postgresql-pltcl
 
@@ -36,6 +36,14 @@ service postgresql initdb
 service postgresql start
 
 su - postgres -c 'PGPASSWORD=spacepw; createdb -E UTF8 spaceschema ; createlang plpgsql spaceschema ; createlang pltclu spaceschema ; yes $PGPASSWORD | createuser -P -sDR spaceuser'
+}
+
+firewall(){
+service iptables stop
+chkconfig iptables off
+}
+
+firewall
 
 yum -y install spacewalk-setup-postgresql
 yum -y install spacewalk-postgresql
