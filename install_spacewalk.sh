@@ -14,9 +14,10 @@ yum -y update
 cd
 if [ -d /root/bin ]
 then
+	cd /root/bin
 	git update https://github.com/marafa/spacewalk.git
 else
-	git clone https://github.com/marafa/spacewalk.git
+	git clone https://github.com/marafa/spacewalk.git bin
 fi
 mv /root/spacewalk /root/bin
 cp /root/bin/jpackage*repo /etc/yum.repos.d/jpackage-generic.repo
