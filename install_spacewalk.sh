@@ -19,7 +19,11 @@ then
 else
 	git clone https://github.com/marafa/spacewalk.git bin
 fi
-mv /root/spacewalk /root/bin
+
+if [ -d /root/spacewalk ]
+then
+	mv /root/spacewalk /root/bin
+fi
 cp /root/bin/jpackage*repo /etc/yum.repos.d/jpackage-generic.repo
 
 ##from https://fedorahosted.org/spacewalk/wiki/PostgreSQLServerSetup
