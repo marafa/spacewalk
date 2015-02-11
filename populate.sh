@@ -66,7 +66,7 @@ echo $rpm > /var/www/html/pub/client.txt
 ####################################################
 # script dependencies
 ### program 1
-rpm -q --whatprovides python-lxml || yum -y install python-lxm
+rpm -q --whatprovides python-lxml || yum -y install python-lxml
 
 ###program 2
 if ! [ -f /etc/yum.repos.d/spacewalk-client.repo ] 
