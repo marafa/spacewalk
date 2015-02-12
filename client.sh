@@ -5,7 +5,7 @@
 ###variables
 bits=`uname -m`
 fqdn=spacewalk.marafa.vm
-ip=192.168.0.104
+ip=192.168.0.105
 #os version
 if [ -s /etc/centos-release ]
 then
@@ -47,7 +47,7 @@ yum -y update $rpm
 rpm -Uvh http://$fqdn/pub/rhn-org-trusted-ssl-cert-1.0-1.noarch.rpm --force
 
 #install rhn tools - to avoid "ERROR: can not find RHNS CA file"
-yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-plugin-security.noarch python-hashlib
+yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-plugin-security.noarch python-hashlib yum-presto deltarpm
 
 #now that /etc/sysconfig/rhn/up2date exists, lets customise it
 if [ -f /etc/sysconfig/rhn/up2date ]
