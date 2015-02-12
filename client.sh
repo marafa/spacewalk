@@ -47,7 +47,7 @@ yum -y update $rpm
 rpm -Uvh http://$fqdn/pub/rhn-org-trusted-ssl-cert-1.0-1.noarch.rpm --force
 
 #install rhn tools - to avoid "ERROR: can not find RHNS CA file"
-yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-plugin-security.noarch python-hashlib yum-presto deltarpm
+yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-plugin-security.noarch python-hashlib yum-presto deltarpm epel-release
 
 #now that /etc/sysconfig/rhn/up2date exists, lets customise it
 if [ -f /etc/sysconfig/rhn/up2date ]
