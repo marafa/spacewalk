@@ -3,7 +3,7 @@
 do_yum(){
 yum -y upgrade ca-certificates --disablerepo=epel
 
-yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm deltarpm yum-presto screen alpine git http://yum.spacewalkproject.org/2.2/RHEL/6/x86_64/spacewalk-repo-2.2-1.el6.noarch.rpm
+yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm deltarpm yum-presto screen alpine git http://yum.spacewalkproject.org/2.2/RHEL/6/x86_64/spacewalk-repo-2.2-1.el6.noarch.rpm createrepo repoview
 
 yum -y update
 }
@@ -25,7 +25,7 @@ fi
 cp /root/bin/jpackage*repo /etc/yum.repos.d/jpackage-generic.repo
 }
 
-hmm(){
+hmm(){ #is this necessary
 ##from https://fedorahosted.org/spacewalk/wiki/PostgreSQLServerSetup
 yum install -y 'postgresql-server > 8.4'
 yum install -y postgresql-pltcl
@@ -52,6 +52,8 @@ localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
+#
+sed -i 's,LANG=.*,LANG="en_US.UTF-8",g' /etc/sysconfig/i18n
 
 #prepare OS
 do_yum
