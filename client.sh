@@ -47,6 +47,7 @@ yum -y update $rpm
 rpm -Uvh http://$fqdn/pub/rhn-org-trusted-ssl-cert-1.0-1.noarch.rpm --force
 
 #install rhn tools - to avoid "ERROR: can not find RHNS CA file"
+yum -y upgrade ca-certificates --disablerepo=epel
 yum -y install epel-release
 yum -y install rhn-setup yum-rhn-plugin python-dmidecode yum-plugin-security.noarch python-hashlib yum-presto deltarpm 
 
