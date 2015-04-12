@@ -233,6 +233,7 @@ if ! [ -e "$prefix/repoview" ] || ! [ -e "$prefix/createrepo" ]
 #if ! [ -e /usr/bin/{repoview,createrepo} ] 
 then
 	echo " WARN: Either repoview or createrepo is not installed. Skipping"
+	echo " WARN: Install with \"yum -y install createrepo repoview\""
 else
 for distro in $ks_distro
 do
@@ -306,3 +307,4 @@ pub_dir
 echo ============================
 echo `date` `hostname`
 rm -rf $lockfile #cleanup
+cp -n /root/bin/spacewalk-populate.logrotate /etc/logrotate.d/spacewalk-populate
