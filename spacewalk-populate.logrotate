@@ -1,0 +1,7 @@
+/var/log/spacewalk_populate.log {
+	daily
+	compress
+	notifempty
+	dateext
+	rotate 30
+}
