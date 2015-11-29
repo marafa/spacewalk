@@ -22,10 +22,6 @@ debug_msg spc_ver is $spc_ver
 [ "grep Linux /etc/redhat-release" ] && version=`cat /etc/redhat-release | awk '{print $4}'| cut -d. -f1` || version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
 debug_msg version is $version
 
-#client channel name
-spc_client=`[ -f /usr/bin/spacewalk-common-channels ] && /usr/bin/spacewalk-common-channels -l | sort  | grep -v nightly | grep client-centos$version | tail -1 | awk '{print $1}'| sed 's/://'`
-debug_msg spc_client is $spc_client
-
 #get OS version
 machine=`uname -m`
 if [ -s /etc/centos-release ] 
@@ -35,6 +31,9 @@ else
         os=rhel
 fi
 
+#client channel name
+spc_client=`[ -f /usr/bin/spacewalk-common-channels ] && /usr/bin/spacewalk-common-channels -l | sort  | grep -v nightly | grep client-$os$version | tail -1 | awk '{print $1}'| sed 's/://'`
+debug_msg spc_client is $spc_client
 ##### spacewalk client repo needed for rhn client packages
 rpm=`rpm -qv spacewalk-client-repo`
 rpm=$rpm.rpm
