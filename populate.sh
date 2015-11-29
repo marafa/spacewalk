@@ -19,12 +19,7 @@ password=password
 spc_ver=`rpm -qv spacewalk-setup| sed 's/spacewalk-setup-//' | cut -d. -f1,2`
 debug_msg spc_ver is $spc_ver
 
-if [ `grep Linux /etc/redhat-release` -eq 0 ]
-then
-	version=`cat /etc/redhat-release | awk '{print $4}'| cut -d. -f1` 
-else
-	version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
-fi
+[ "grep Linux /etc/redhat-release" ] && version=`cat /etc/redhat-release | awk '{print $4}'| cut -d. -f1` || version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
 debug_msg version is $version
 
 #client channel name
