@@ -62,6 +62,11 @@ then
 fi
 
 echo $rpm > /var/www/html/pub/client.txt
+if [ -f /usr/bin/firewall-cmd ]
+then
+	firewall-cmd --add-service=http --permanent 
+	firewall-cmd --add-service=https --permanent
+fi
 
 ####################################################
 # script dependencies
