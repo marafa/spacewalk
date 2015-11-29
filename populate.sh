@@ -32,13 +32,14 @@ else
 fi
 
 version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
-
+debug_msg version is $version
 client_repo_URL=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/x86_64/spacewalk-client-repo-2.4-3.el7.noarch.rpm
+debug_msg client_repo_URL is $client_repo_URL 
 
 ##### spacewalk client repo needed for rhn client packages
 rpm=`rpm -qv spacewalk-client-repo`
 rpm=$rpm.rpm
-
+debug_msg spacewalk_client_repo rpm is $rpm
 #end variables section
 ####################################################
 }
