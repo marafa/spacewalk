@@ -21,18 +21,19 @@ debug_msg spc_ver is $spc_ver
 #client channel name
 spc_client=`[ -f /usr/bin/spacewalk-common-channels ] && /usr/bin/spacewalk-common-channels -l | sort  | grep -v nightly | grep client-centos6 | tail -1 | awk '{print $1}'| sed 's/://'`
 debug_msg spc_client is $spc_client
-client_repo_URL=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/6/x86_64/spacewalk-client-repo-2.2-1.el6.noarch.rpm
 
 #get OS version
 machine=`uname -m`
 if [ -s /etc/centos-release ] 
 then
         os=centos
-        grep 6 /etc/centos-release > /dev/null && version=6 || version=5
 else
         os=rhel
-        grep 6 /etc/redhat-release > /dev/null && version=6 || version=5
 fi
+
+version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
+
+client_repo_URL=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/x86_64/spacewalk-client-repo-2.2-1.el6.noarch.rpm
 
 ##### spacewalk client repo needed for rhn client packages
 rpm=`rpm -qv spacewalk-client-repo`
