@@ -288,9 +288,9 @@ then
 fi
 }
 
-variables
 #debug=TRUE #enable this if u only want specific debug messages
 #debug #do not use in batch mode
+variables
 preparation
 #rhel5
 #centos5
