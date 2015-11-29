@@ -11,4 +11,4 @@ b) configure crontab to run populate.sh once a day
 * populate.sh 		- will populate your spacewalk server with everything you need from channel setup to packages and errata - will take hours the first time it runs
 * rhel_channels.ini 	- used by spacewalk-common-channels to create RHEL channels
 * spacewalk.answer 	- my answer file to install spacewalk, configured for postgresql
-* install_spacewalk.sh - installs spacewalk ;)
+* install_spacewalk.sh  - installs spacewalk ;)
