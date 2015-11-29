@@ -40,7 +40,7 @@ service postgresql start
 su - postgres -c 'PGPASSWORD=spacepw; createdb -E UTF8 spaceschema ; createlang plpgsql spaceschema ; createlang pltclu spaceschema ; yes $PGPASSWORD | createuser -P -sDR spaceuser'
 }
 
-firewall(){
+do_firewall(){
 service iptables stop
 chkconfig iptables off
 }
@@ -64,7 +64,7 @@ sed -i 's,LANG=.*,LANG="en_US.UTF-8",g' /etc/sysconfig/i18n
 do_yum
 do_git
 do_locale
-firewall
+do_firewall
 do_postgresql
 
 cd /root/bin
