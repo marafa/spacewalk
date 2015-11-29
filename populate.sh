@@ -11,7 +11,7 @@ debug=FALSE
 dir=/local/rhn/
 file=/tmp/spacewalk.rpms.lst
 repo=/var/www/html/pub/repo
-
+lockfile=/var/tmp/populate.lck
 #spacewalk admin credentials
 user=admin
 password=password
@@ -276,7 +276,9 @@ echo ============================
 echo `date` `hostname`
 echo ============================
 
-lockfile=/var/tmp/populate.lck
+#remove lockfile on ctrl-c
+trap "rm ${lockfile}" EXIT
+
 #create lock file
 if [ -e $lockfile ]
 then
