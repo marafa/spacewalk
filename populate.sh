@@ -35,8 +35,6 @@ else
         os=rhel
 fi
 
-
-
 ##### spacewalk client repo needed for rhn client packages
 rpm=`rpm -qv spacewalk-client-repo`
 rpm=$rpm.rpm
@@ -61,7 +59,7 @@ if ! [ -f /var/www/html/pub/$rpm ]
 then
         loc=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/$machine/
 	echo " INFO: Downloading $loc$rpm"
-        wget $loc$rpm --quiet -O /var/www/html/pub/$rpm > /dev/null 2>&1
+        curl $loc$rpm -s -o /var/www/html/pub/$rpm > /dev/null 2>&1
 fi
 
 echo $rpm > /var/www/html/pub/client.txt
