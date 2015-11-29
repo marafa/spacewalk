@@ -31,7 +31,7 @@ else
         os=rhel
 fi
 
-version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
+[ grep Linux /etc/redhat-release ] && version=`cat /etc/redhat-release | awk '{print $4}'| cut -d. -f1` || version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
 debug_msg version is $version
 
 ##### spacewalk client repo needed for rhn client packages
