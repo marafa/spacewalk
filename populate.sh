@@ -33,7 +33,7 @@ fi
 
 version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
 
-client_repo_URL=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/x86_64/spacewalk-client-repo-2.2-1.el6.noarch.rpm
+client_repo_URL=http://yum.spacewalkproject.org/$spc_ver-client/RHEL/$version/x86_64/spacewalk-client-repo-2.4-3.el7.noarch.rpm
 
 ##### spacewalk client repo needed for rhn client packages
 rpm=`rpm -qv spacewalk-client-repo`
