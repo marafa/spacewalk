@@ -1,13 +1,13 @@
 #!/bin/sh
 
+client_file=/root/bin/client.sh
+
 do_yum(){
-	
 yum clean all
 yum -y upgrade ca-certificates --disablerepo=epel
 
 #yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm deltarpm yum-presto screen alpine git http://yum.spacewalkproject.org/2.2/RHEL/6/x86_64/spacewalk-repo-2.2-1.el6.noarch.rpm createrepo repoview
 yum -y install epel-release deltarpm yum-presto screen alpine git createrepo repoview http://yum.spacewalkproject.org/2.4/RHEL/7/x86_64/spacewalk-repo-2.4-3.el7.noarch.rpm
-
 yum -y update
 }
 
@@ -60,12 +60,23 @@ export LC_ALL="en_US.UTF-8"
 sed -i 's,LANG=.*,LANG="en_US.UTF-8",g' /etc/sysconfig/i18n
 }
 
+do_client_file(){
+if [ -f $client_file ]	
+then
+	fqdn=`hostname`
+	ip=`hostname -I`
+fi
+sed -i "s/fqdn=.*/fqdn=$fqdn/g" $client_file
+sed -i "s/ip=.*/ip=$ip/g" $client_file	
+}
+
 #prepare OS
 do_yum
 do_git
 do_locale
 do_firewall
 do_postgresql
+do_client_file
 
 cd /root/bin
 spacewalk-setup --disconnected --answer-file=spacewalk.answer
