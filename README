@@ -1,4 +1,4 @@
-These are scripts and configuration files used to configure a spacewalk server and its client as well as maintaining channels are kept updated.
+These are _highly_ _opinionated_ scripts and configuration files used to configure a spacewalk server and its client as well as maintaining channels are kept updated.
 
 # How to use:
 a) run install_spacewalk.sh
