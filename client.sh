@@ -6,14 +6,18 @@
 bits=`uname -m`
 fqdn=spacewalk.marafa.vm
 ip=192.168.0.105
+
 #os version
-if [ -s /etc/centos-release ]
+[ "grep Linux /etc/redhat-release" ] && version=`cat /etc/redhat-release | awk '{print $4}'| cut -d. -f1` || version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
+debug_msg version is $version
+
+#get OS version
+machine=`uname -m`
+if [ -s /etc/centos-release ] 
 then
-	os=centos
-	grep 6 /etc/centos-release > /dev/null && version=6 || version=5
+        os=centos
 else
-	os=rhel
-        grep 6 /etc/redhat-release > /dev/null && version=6 || version=5
+        os=rhel
 fi
 
 ###main
