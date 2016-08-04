@@ -279,6 +279,9 @@ echo ============================
 #remove lockfile on ctrl-c
 trap "rm ${lockfile}" EXIT
 
+#load variables
+variables
+
 #create lock file
 if [ -e $lockfile ]
 then
