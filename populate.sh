@@ -3,6 +3,13 @@
 ### if this is the first time, it will initialize the repo
 ### different strategies are used to populate each OS
 
+debug_msg(){
+if [ debug == "TRUE" ] 
+then
+	echo Debug $*
+fi
+}
+
 variables(){
 ############################################
 #begin variables section
@@ -291,20 +298,13 @@ else
 	touch $lockfile
 fi
 
-debug_msg(){
-if [ debug == "TRUE" ] 
-then
-	echo Debug $*
-fi
-}
-
 #debug=TRUE #enable this if u only want specific debug messages
 #debug #do not use in batch mode
 variables
 preparation
 #rhel5
 #centos5
-centos6
+#centos6
 centos7
 #spacewalk_client #in case we need to do this alone
 #cobbler

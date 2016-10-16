@@ -4,8 +4,8 @@
 
 ###variables
 bits=`uname -m`
-fqdn=spacewalk.marafa.vm
-ip=192.168.0.105
+fqdn=spacewalk.cloud.egit
+ip=10.200.1.9 
 
 #os version
 [ "grep Linux /etc/redhat-release" ] && version=`cat /etc/redhat-release | awk '{print $4}'| cut -d. -f1` || version=`cat /etc/redhat-release | awk '{print $3}'| cut -d. -f1`
