@@ -316,5 +316,5 @@ pub_dir
 #end
 echo ============================
 echo `date` `hostname`
-rm -rf $lockfile #cleanup
+[ -f $lockfile ] && rm -rf $lockfile #cleanup
 cp -n /root/bin/spacewalk-populate.logrotate /etc/logrotate.d/spacewalk-populate
